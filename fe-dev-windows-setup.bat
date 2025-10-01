@@ -1,60 +1,43 @@
 @echo off
-echo ============================================
-echo  🚀 Setting up Frontend Dev Environment...
-echo ============================================
+echo ==========================================
+echo 🚀 Frontend Dev Environment Setup - Windows 11
+echo ==========================================
 echo.
 
-REM --- Install packages via winget ---
-set PACKAGES=Git.Git Microsoft.VisualStudioCode Microsoft.WindowsTerminal Google.Chrome Mozilla.Firefox CoreyButler.NVMforWindows Figma.Figma Postman.Postman Docker.DockerDesktop
+:: Ensure PowerShell execution policy is relaxed
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force"
 
-for %%i in (%PACKAGES%) do (
-    echo 📦 Installing %%i...
-    winget install --id %%i -e --accept-package-agreements --accept-source-agreements
-)
+:: Install Scoop
+echo 📦 Installing Scoop (if not already installed)...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) { irm get.scoop.sh | iex } else { Write-Host '✅ Scoop already installed' }"
 
-REM --- Set environment variables for NVM (just in case) ---
-setx NVM_HOME "%ProgramFiles%\nvm" /M
-setx NVM_SYMLINK "%ProgramFiles%\nodejs" /M
+:: Add extras bucket
+powershell -NoProfile -ExecutionPolicy Bypass -Command "scoop bucket add extras"
 
-REM --- Update PATH for current session ---
-set "PATH=%ProgramFiles%\nvm;%ProgramFiles%\nodejs;%PATH%"
+:: Core Tools
+powershell -NoProfile -ExecutionPolicy Bypass -Command "scoop install git gh nodejs-lts python nvm"
 
-REM --- Install and use Node.js LTS via nvm ---
-echo ⬇️ Installing Node.js LTS via nvm...
-nvm install lts
-nvm use lts
+:: Node.js package managers
+powershell -NoProfile -ExecutionPolicy Bypass -Command "npm install -g yarn pnpm"
 
-REM --- Install global npm packages ---
-set NPM_GLOBALS=yarn pnpm typescript eslint prettier create-react-app vite serve
+:: IDE
+powershell -NoProfile -ExecutionPolicy Bypass -Command "scoop install vscode"
 
-for %%p in (%NPM_GLOBALS%) do (
-    echo 🌍 Installing npm package: %%p
-    call npm install -g %%p
-)
+:: API Tools
+powershell -NoProfile -ExecutionPolicy Bypass -Command "scoop install postman insomnia"
 
-REM --- Create a Projects directory ---
-set PROJECTS_DIR=%USERPROFILE%\Projects
-if not exist "%PROJECTS_DIR%" (
-    mkdir "%PROJECTS_DIR%"
-    echo 📁 Created Projects folder at %PROJECTS_DIR%
-)
+:: Database
+powershell -NoProfile -ExecutionPolicy Bypass -Command "scoop install mongodb"
 
-REM --- Generate SSH Key (if needed) ---
-set SSH_DIR=%USERPROFILE%\.ssh
-if not exist "%SSH_DIR%" (
-    echo 🔐 Generating new SSH key...
-    powershell -Command "ssh-keygen -t ed25519 -C \"your_email@example.com\""
-) else (
-    echo ✅ SSH key already exists.
-)
+:: Git Config (change this to your info!)
+powershell -NoProfile -ExecutionPolicy Bypass -Command "git config --global user.name 'Your Name'"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "git config --global user.email 'your@email.com'"
+
+:: Enable WSL2
+powershell -NoProfile -ExecutionPolicy Bypass -Command "wsl --install"
 
 echo.
-echo ============================================
-echo ✅ Setup Complete!
-echo --------------------------------------------
-echo 💡 Next steps:
-echo - Add SSH key to GitHub: https://github.com/settings/ssh/new
-echo - Open VS Code and install recommended extensions.
-echo - Happy coding!
-echo ============================================
+echo ✅ Frontend Dev Setup Complete!
+echo 👉 Restart your computer once, then start coding 🚀
 pause
